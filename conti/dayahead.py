@@ -82,7 +82,7 @@ def conti(path, startdate, enddate):
             for k in datoer:
                 filename = k.strftime('result-ALL_%Y-%m-%d T%H%M.xls')
                 date_files_sorted.append(filename)
-            last_file_in_date.append(date_files_sorted[0])  # change here if you want to get the first or last file of date
+            last_file_in_date.append(date_files_sorted[-1])  # change here if you want to get the first or last file of date
 
     countries = get_args.countries.replace(" ", "").split(',')
     n = len(countries)
@@ -128,13 +128,8 @@ def creating_file_conti(data):
             data[i].to_excel(writer, sheet_name = ('DayAhead - ' + countries[i]))                
 
 
-def creating_file_nordics(data):
-    filename = get_args.filename
-    countries = get_args.countries
-    with pd.ExcelWriter((filename + '.xlsx')) as writer:
-        data.to_excel(writer, sheet_name = countries)
 
 
-path = r'M:/Database/NordicAreaPriceModel/prices_forecasts/napm_dayahead.csv'
+path = r'M:/EUROPA/Power Balance/Conti Model/History/Different runs within day'
 data = conti(path, parse_arguments().startday, parse_arguments().endday)
 creating_file_conti(data)
