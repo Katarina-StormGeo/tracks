@@ -1,0 +1,89 @@
+import json
+import pandas as pd
+import xarray as xr
+import yaml
+import time
+from itertools import dropwhile
+import sys 
+import os
+import subprocess
+import requests
+import argparse
+from io import StringIO
+import logging
+from logging.handlers import TimedRotatingFileHandler
+import numpy as np
+import traceback
+import operator
+import re
+from dateutil.relativedelta import relativedelta
+import glob
+from datetime import datetime, timedelta, date
+from calendar import monthrange, month_name
+
+def parse_arguments():
+    parser = argparse.ArgumentParser()
+    
+    parser.add_argument("-c","--countries",dest="countries",
+            help="Countries", required=True)
+    parser.add_argument("-s","--startday",dest="startday",
+            help="Start day in the form YYYY-MM-DD", required=False)
+    parser.add_argument("-e","--endday",dest="endday",
+            help="End day in the form YYYY-MM-DD", required=False)
+    parser.add_argument("-f","--filename",dest="filename",
+        help="Choose between block, state, wigos and ship", required=True)
+    args = parser.parse_args()
+    
+    if args.startday is None:
+        pass
+    else:
+        try:
+            datetime.strptime(args.startday,'%Y-%m-%d')
+        except ValueError:
+            raise ValueError
+        
+    if args.endday is None:
+            pass
+    else:
+        try:
+            datetime.strptime(args.endday,'%Y-%m-%d')
+        except ValueError:
+            raise ValueError
+        
+    if args.countries is None:
+        parser.print_help()
+        parser.exit()
+
+    return args
+
+get_args = parse_arguments()
+
+              
+def nordic(path, startdate, enddate):
+    start_date = startdate
+    end_date = enddate
+
+    df = pd.read_csv(path, index_col = 0)
+    df = df[startdate:enddate]
+
+    countries = get_args.countries.replace(" ", "").split(',')
+    countries.append('ForecastDate')
+    if 'NO' not in countries or 'SE' not in countries or 'DK' not in countries:
+        df = df[countries]
+    else:
+        print('You must specify area such as NO1, NO2, etc..')
+
+    return df
+
+
+
+def creating_file_nordics(data):
+    filename = get_args.filename
+    countries = get_args.countries
+    with pd.ExcelWriter((filename + '.xlsx')) as writer:
+        data.to_excel(writer, sheet_name = countries)
+
+
+path = r'M:/Database/NordicAreaPriceModel/prices_forecasts/napm_dayahead.csv'
+data = nordic(path, parse_arguments().startday, parse_arguments().endday)
+creating_file_nordics(data)
