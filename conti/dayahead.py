@@ -58,26 +58,6 @@ def parse_arguments():
 
 get_args = parse_arguments()
 
-print(get_args)
-
-def nordic_or_conti():
-
-    countries = get_args.countries.split(',')
-    nordics = ['NO', 'NO1', 'NO2', 'NO3', 'NO4', 'NO5', 'SE', 'SE1', 'SE2', 'SE3', 'SE4', 'DK', 'DK1', 'DK2', 'FI']
-    checker = 0
-    for i in countries:
-        if i in nordics:
-            checker += 1
-
-    if checker == 0:
-        path = r'M:/EUROPA/Power Balance/Conti Model/History/Different runs within day'
-    else:   
-        path = r'M:/Database/NordicAreaPriceModel/prices_forecasts/napm_dayahead.csv'
-
-    return path
-
-
-#print(os.listdir(r'M:/EUROPA/Power Balance/Conti Model/History/Different runs within day'))
 
 def conti(path, startdate, enddate):
     files = os.listdir(path)
@@ -138,23 +118,6 @@ def conti(path, startdate, enddate):
 
     return concated
 
-def nordic(path, startdate, enddate):
-    start_date = startdate
-    end_date = enddate
-
-    df = pd.read_csv(path, index_col = 0)
-    df = df[startdate:enddate]
-
-    countries = get_args.countries.replace(" ", "").split(',')
-    countries.append('ForecastDate')
-    if 'NO' not in countries or 'SE' not in countries or 'DK' not in countries:
-        df = df[countries]
-    else:
-        print('You must specify area such as NO1, NO2, etc..')
-
-    return df
-
-#print(nordic(nordic_or_conti(), parse_arguments().startday, parse_arguments().endday))
 
 def creating_file_conti(data):
     filename = get_args.filename
@@ -172,8 +135,6 @@ def creating_file_nordics(data):
         data.to_excel(writer, sheet_name = countries)
 
 
-data = conti(nordic_or_conti(), parse_arguments().startday, parse_arguments().endday)
+path = r'M:/Database/NordicAreaPriceModel/prices_forecasts/napm_dayahead.csv'
+data = conti(path, parse_arguments().startday, parse_arguments().endday)
 creating_file_conti(data)
-
-#data = nordic(nordic_or_conti(), parse_arguments().startday, parse_arguments().endday)
-#creating_file_nordics(data)
