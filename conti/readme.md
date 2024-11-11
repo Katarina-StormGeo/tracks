@@ -1,3 +1,3 @@
 
 * dayahead can give both daily and hourly mean
-* weekahead is not completely finished
+* weekahead and weekahead_hourly is not completely finished
